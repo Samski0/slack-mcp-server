@@ -35,10 +35,12 @@ FROM alpine:3.22 AS production
 RUN apk add --no-cache ca-certificates net-tools curl
 
 COPY --from=build /go/bin/mcp-server /usr/local/bin/mcp-server
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 WORKDIR /app
 
 EXPOSE 3001
 
-ENTRYPOINT ["mcp-server"]
+ENTRYPOINT ["entrypoint.sh"]
 CMD ["--transport", "sse"]
