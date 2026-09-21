@@ -1,0 +1,20 @@
+#!/bin/sh
+# Refuse any commit whose staged diff contains something that looks like a
+# credential. See .gitleaks.toml for why this exists and how allowlisting works.
+#
+# Enable per clone (linked worktrees share the setting):
+#   git config core.hooksPath .githooks
+#
+# Fails closed if gitleaks is missing: a hook that silently passes when the
+# scanner is absent is the same as no hook, and the one time it matters is the
+# machine that never installed it. `git commit --no-verify` is the escape hatch
+# and shows up in the shell history of whoever used it.
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "pre-commit: gitleaks is not installed; refusing to commit unscanned." >&2
+  echo "           brew install gitleaks   (or see https://github.com/gitleaks/gitleaks)" >&2
+  exit 1
+fi
+
+exec gitleaks git --pre-commit --staged --redact --verbose --no-banner --exit-code 1 \
+  --config "$(git rev-parse --show-toplevel)/.gitleaks.toml"

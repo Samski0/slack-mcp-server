@@ -1,0 +1,18 @@
+# gitleaks configuration for the pre-commit hook in .githooks/pre-commit.
+#
+# Why this exists: a committed service-account key in July 2026 required a
+# history rewrite and a force-push, and a 2026-09-03 audit found four more
+# live credentials in Claude Code config. A 2026-09-21 audit found the hook
+# that was written in response existed in one repo, untracked, on one laptop.
+# This runs gitleaks' default ruleset over the staged diff and refuses the
+# commit on any hit.
+#
+# Allowlisting policy: allowlist a *value*, never a *path*. A path allowlist
+# turns a whole file into a blind spot; a value allowlist only exempts the
+# one string you have looked at and know to be fake. If the hook blocks you
+# on something real-looking, the answer is to remove it, not to widen this.
+
+title = "slack-mcp-server gitleaks config"
+
+[extend]
+useDefault = true
